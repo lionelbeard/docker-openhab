@@ -1,0 +1,40 @@
+version: "2"
+services:
+  mysql:
+     image: yobasystems/alpine-mariadb:armhf
+     restart: unless-stopped
+     hostname: mysql
+     volumes:
+         - /var/lib/mysql:/var/lib/mysql
+     ports:
+         - 3306:3306
+  openhab:
+     image: "openhab/openhab:2.2.0-armhf-debian"
+     restart: unless-stopped
+     tty: true
+     volumes:
+         - "/etc/localtime:/etc/localtime:ro"
+         - "/etc/timezone:/etc/timezone:ro"
+         - "/srv/openhab2-addons:/openhab/addons"
+         - "/srv/openhab2-conf:/openhab/conf"
+         - "/srv/openhab2-userdata:/openhab/userdata"
+     environment:
+         OPENHAB_HTTP_PORT: "8080"
+         OPENHAB_HTTPS_PORT: "8443"
+         USER_ID: "108"
+         GROUP_ID: "115"
+#         EXTRA_JAVA_OPTS: "-Dgnu.io.rxtx.SerialPorts=/dev/USBrs485:/dev/USBrfxcom:/dev/USBzwave"
+         EXTRA_JAVA_OPTS: "-Dgnu.io.rxtx.SerialPorts=/dev/USBrs485:/dev/USBrfxcom"
+     devices:
+#         - "/dev/USBzwave:/dev/USBzwave"
+         - "/dev/USBrfxcom:/dev/USBrfxcom"
+         - "/dev/USBrs485:/dev/USBrs485"
+     ports:
+         - 8080:8080
+         - 8443:8443
+         - 8101:8101
+         - 5007:5007
+     depends_on:
+         - mysql
+     links:
+         - "mysql"
